@@ -1,0 +1,22 @@
+#Script file
+hui = character("hui", "ffffff")
+define main_font font/fnt.ttf
+define main_bg image/bg/main.png
+define main_music sound/music/main.mp3
+define hui_happy image/alsa/happy.png
+define hui_angry image/alsa/angry.png
+
+
+label(_start)
+	set_font(main_font)
+	set_bg(main_bg)
+	set_music(main_music)
+	show(hui_happy, pos=center, smooth=false)
+	hui.say("fuck you")
+	hide(pos=left, smooth=false)
+	show(hui_angry, pos=center, smooth=false)
+	jmp(next)
+
+label(next)
+	
+
