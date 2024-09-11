@@ -72,8 +72,8 @@ static void push_audio(node **first, const char* name,
 			tmp->audio->music = Mix_LoadMUS(path);
 			tmp->audio->chunk = NULL;
 		} else {
-		    tmp->audio->chunk = Mix_LoadWAV(path);
-            tmp->audio->music = NULL;
+			tmp->audio->chunk = Mix_LoadWAV(path);
+			tmp->audio->music = NULL;
 		}
 		cn_strncpy(tmp->audio->name, name, audio_name_str_size);
 		tmp->audio->is_playing = cn_false;
