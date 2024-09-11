@@ -42,9 +42,9 @@ enum cfg_index {
 
 static void set_as_default(config* cfg)
 {
-	cfg->width = 1920;
-	cfg->height = 1080;
-	cfg->fullscreen = 1;
+	cfg->width = 192;
+	cfg->height = 108;
+	cfg->fullscreen = 0;
 	cfg->music = 50;
 	cfg->effect = 50;
 	cfg->voice = 50;
