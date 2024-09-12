@@ -62,7 +62,7 @@ static void push_audio(node **first, const char* name,
                        const char* path, load_type type)
 {
 
-    if(!*first) {
+	if(!*first) {
 		node* tmp;
 		tmp = malloc(sizeof(node));
 		tmp->audio = malloc(sizeof(cn_audio));
