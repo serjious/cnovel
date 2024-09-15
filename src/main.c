@@ -6,8 +6,58 @@
 #include "sound.h"
 #include "input.h"
 #include "menu.h"
+#include "save.h"
 
 
+int main(int argc, char* argv[])
+{
+	int st;
+	config* cfg;
+	
+	if(argc < 4) {
+        fprintf(stderr, "argv err\n");
+        return 1;
+    }
+
+    cfg = calloc(sizeof(config), 1);
+
+    st = read_from_config(argv[1], cfg);
+    ERROR_HANDLING(st);
+
+    st = init_audio(cfg);
+    ERROR_HANDLING(st);
+	
+	st = load("saveall.bin");	
+	ERROR_HANDLING(st);
+
+	while(1)
+	{
+		int c = getchar();
+		if(c == EOF || c == 'q')
+			break;
+	}
+	
+	
+/*
+	load_music(argv[2], argv[2]);	
+	load_effect(argv[3], argv[3]);	
+	load_voice(argv[4], argv[4]);	
+	
+	play_voice(argv[4]);
+	save("saveall.bin");
+	while(1)
+	{
+		int c = getchar();
+		if(c == EOF || c == 'q')
+			break;
+	}
+*/		
+    close_audio();
+    free(cfg);
+	return 0;
+	
+}
+/*
 int main(int argc, char* argv[])
 {
     int st;
@@ -30,9 +80,6 @@ int main(int argc, char* argv[])
     st = init_audio(cfg);
     ERROR_HANDLING(st);
 
-    load_music("1", argv[2]);
-    st = play_music("1");
-    ERROR_HANDLING(st);
     while(run_window())
     {
         prepareScene();
@@ -48,6 +95,7 @@ int main(int argc, char* argv[])
     free(cfg);
 	return 0;
 }
+*/
 /*
 int main(int argc, char* argv[])
 {

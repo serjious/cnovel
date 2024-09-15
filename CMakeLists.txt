@@ -16,6 +16,7 @@ set(SOURCES src/main.c
 			src/menu.c
 			src/engine.c
 			src/input.c
+			src/save.c
 )
 set(HEADERS include/config.h
             include/error.h
@@ -28,6 +29,7 @@ set(HEADERS include/config.h
 			include/menu.h
 			include/engine.h
 			include/input.h
+			include/save.h
 )
 add_executable(cnovel ${SOURCES} ${HEADERS})
 target_link_libraries(cnovel SDL2 SDL2_mixer SDL2_image)

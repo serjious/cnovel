@@ -15,8 +15,13 @@ int key_handler()
     {
         if(event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
+			case SDLK_l:
+				load("saveall.bin");
+				printf("load save.bin\n");
+				break;
 			case SDLK_s:
-				save_audio_to_file();	
+				save("saveall.bin");
+				printf("save save.bin\n");
 				break;
             case SDLK_ESCAPE:
                 return 1;

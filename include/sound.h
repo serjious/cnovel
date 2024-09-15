@@ -2,6 +2,7 @@
 #define SOUND_H_SENTRY
 
 #include "config.h"
+#include <stdio.h>
 
 typedef enum m_playback_options {
 	cn_loop = -1,
@@ -32,7 +33,8 @@ void resume_music();
 void resume_voice();
 void resume_effect();
 
-int save_audio_to_file();
+int save_audio_to_file(FILE* fd);
+int load_audio_from_file(FILE* fd);
 
 void close_audio();
 
