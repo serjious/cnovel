@@ -16,7 +16,7 @@ enum {
 
 enum {
 	chunk_size = 2048,
-    audio_name_str_size = 128,
+	audio_name_str_size = 128,
 	path_str_size = 128 /*change*/
     /*variable size is not may be different*/
 };
@@ -145,18 +145,18 @@ int init_audio(config* cfg)
 	init = SDL_Init(SDL_INIT_AUDIO);
 
 	if(-1 == init) {
-        fatal_error(cn_ok);
-        send_message_error(Mix_GetError());
-        return -1;
+		fatal_error(cn_ok);
+		send_message_error(Mix_GetError());
+		return -1;
 	}
 
 	init = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
                          MIX_DEFAULT_FORMAT,
                          MIX_DEFAULT_CHANNELS, chunk_size);
-    if(-1 == init) {
+	if(-1 == init) {
         fatal_error(cn_ok);
         send_message_error(Mix_GetError());
-        return -1;
+		return -1;
 	}
 
 	set_volume(cfg);
@@ -221,7 +221,6 @@ int play_music(const char* name)
     }
     audio->is_playing = cn_true;
     return 0;
-	/*error handling*/
 }
 
 int play_voice(const char* name)
@@ -352,6 +351,7 @@ int save_audio_to_file()
 }
 int load_audio_from_file()
 {
+	return 0;
 }
 
 void close_audio()
