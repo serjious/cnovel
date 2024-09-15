@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "strutils.h"
 #include "def.h"
+#include "save.h"
 
 
 enum {
@@ -14,8 +15,9 @@ enum {
 };
 
 enum {
-    /*add chunk_size*/
-    audio_name_str_size = 128
+	chunk_size = 2048,
+    audio_name_str_size = 128,
+	path_str_size = 128 /*change*/
     /*variable size is not may be different*/
 };
 
@@ -23,13 +25,22 @@ typedef enum m_load_type {
     cn_music,
     cn_chunk
 } load_type;
-
+/*maybe mv save.h*/
+typedef struct m_audio_info {
+	cn_type_data_save type;	
+	int len;
+} cn_audio_info;
 
 typedef struct m_audio {
-    char name[audio_name_str_size];
-    Mix_Music *music;
-    Mix_Chunk *chunk;
-    cn_bool is_playing;
+	char name[audio_name_str_size];
+	char path[path_str_size];
+	
+	load_type type;
+	
+	cn_bool is_playing;
+	
+    Mix_Music* music;
+    Mix_Chunk* chunk;
 } cn_audio;
 
 typedef struct m_node {
@@ -55,7 +66,7 @@ static void set_first(node* new_first)
 
 static node* get_first()
 {
-    return first_elem(NULL, cn_set);
+    return first_elem(NULL, cn_get);
 }
 
 static void push_audio(node **first, const char* name,
@@ -76,6 +87,8 @@ static void push_audio(node **first, const char* name,
 			tmp->audio->music = NULL;
 		}
 		cn_strncpy(tmp->audio->name, name, audio_name_str_size);
+		cn_strncpy(tmp->audio->path, path, path_str_size);
+		tmp->audio->type = type;
 		tmp->audio->is_playing = cn_false;
 		*first = tmp;
     } else {
@@ -97,6 +110,18 @@ static void delete_audio(node** first)
     free(*first);
     *first = NULL;
 }
+static int len_audio(node *first)
+{
+	node* tmp = first;
+	int count = 0;
+	while(tmp)
+	{
+		count++;
+		tmp = tmp->next;	
+	}
+	return count;
+}
+
 static cn_audio* search_audio(node* first, const char* name)
 {
     node* tmp = first;
@@ -115,8 +140,6 @@ static cn_audio* search_audio(node* first, const char* name)
 int init_audio(config* cfg)
 {
 	int init;
-	/*enum*/
-	int chunk_size = 2048;
 
 
 	init = SDL_Init(SDL_INIT_AUDIO);
@@ -226,7 +249,7 @@ int play_effect(const char* name, playback_options opt)
     int st;
     node* first = get_first();
     cn_audio* audio = search_audio(first, name);
-    if(audio || !audio->chunk) {
+    if(!audio || !audio->chunk) {
         fatal_error(cn_ok);
         send_message_error("No effect whis this name found");
         return -1;
@@ -301,9 +324,39 @@ void resume_effect()
     Mix_Resume(cn_channel_effect);
 }
 
+int save_audio_to_file()
+{
+	FILE* fd;
+	cn_audio_info info;
+	node* first;
+	int len;
+	
+	fd = fopen("save.bin", "wb");
+	if(!fd)
+		return -1;
+		
+	first = get_first();
+	len = len_audio(first);
+
+	info.type = cn_type_audio;
+	info.len = len;
+
+	fwrite(&info, 1, sizeof(info), fd);
+	while(first)
+	{	
+		fwrite(first->audio, 1, sizeof(cn_audio), fd);
+		first = first->next;
+	}
+	fclose(fd);
+	return 0;
+}
+int load_audio_from_file()
+{
+}
+
 void close_audio()
 {
-    node* first = get_first();
+	node* first = get_first();
 
     halt_music();
     halt_voice();

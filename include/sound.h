@@ -32,6 +32,8 @@ void resume_music();
 void resume_voice();
 void resume_effect();
 
+int save_audio_to_file();
+
 void close_audio();
 
 #endif

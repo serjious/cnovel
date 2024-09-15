@@ -1,11 +1,11 @@
 #include "input.h"
 #include "def.h"
 #include "sound.h"
+#include "save.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_joystick.h>
-
 
 int key_handler()
 {
@@ -15,6 +15,9 @@ int key_handler()
     {
         if(event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
+			case SDLK_s:
+				save_audio_to_file();	
+				break;
             case SDLK_ESCAPE:
                 return 1;
             case SDLK_q:
@@ -27,6 +30,7 @@ int key_handler()
                     resume_music();
                     is_pause = cn_false;
                 }
+				break;
             }
             return 0;
         }
