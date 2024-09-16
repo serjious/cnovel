@@ -32,5 +32,13 @@ set(HEADERS include/config.h
 			include/save.h
 )
 add_executable(cnovel ${SOURCES} ${HEADERS})
-target_link_libraries(cnovel SDL2 SDL2_mixer SDL2_image)
+
+if(WIN32)
+	target_link_libraries(cnovel mingw32 SDL2main SDL2 SDL2_mixer SDL2_image)
+endif(WIN32)
+
+if(UNIX)
+	target_link_libraries(cnovel SDL2main SDL2 SDL2_mixer SDL2_image)
+endif(UNIX)
+
 
