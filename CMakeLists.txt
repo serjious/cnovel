@@ -17,6 +17,7 @@ set(SOURCES src/main.c
 			src/engine.c
 			src/input.c
 			src/save.c
+			src/log.c
 )
 set(HEADERS include/config.h
             include/error.h
@@ -30,6 +31,7 @@ set(HEADERS include/config.h
 			include/engine.h
 			include/input.h
 			include/save.h
+			include/log.h
 )
 add_executable(cnovel ${SOURCES} ${HEADERS})
 
