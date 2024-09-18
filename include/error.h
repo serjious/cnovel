@@ -2,7 +2,7 @@
 #define CNOVEL_ERROR_H_SENTRY
 
 #define ERROR_HANDLING(err)	do	\
-	if(-1 == err) {					\
+	if(-1 == err) {				\
 		print_error();			\
 		if(is_fatal_error())	\
 			return 1;			\
