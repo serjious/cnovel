@@ -7,6 +7,7 @@
 #include "input.h"
 #include "menu.h"
 #include "save.h"
+#include "log.h"
 
 
 int main(int argc, char* argv[])
@@ -19,6 +20,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+	enable_log();
+
     cfg = calloc(sizeof(config), 1);
 
     st = read_from_config(argv[1], cfg);
@@ -27,6 +30,7 @@ int main(int argc, char* argv[])
     st = init_audio(cfg);
     ERROR_HANDLING(st);
 	
+/*
 	st = load("saveall.bin");	
 	ERROR_HANDLING(st);
 
@@ -38,20 +42,21 @@ int main(int argc, char* argv[])
 	}
 	
 	
-/*
+*/
 	load_music(argv[2], argv[2]);	
 	load_effect(argv[3], argv[3]);	
 	load_voice(argv[4], argv[4]);	
 	
 	play_voice(argv[4]);
-	save("saveall.bin");
+	st = save("game/saves/save1.bin");
+	ERROR_HANDLING(st);
 	while(1)
 	{
 		int c = getchar();
 		if(c == EOF || c == 'q')
 			break;
 	}
-*/		
+		
     close_audio();
     free(cfg);
 	return 0;

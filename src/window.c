@@ -9,6 +9,7 @@
 #include "window.h"
 #include "def.h"
 #include "sound.h"
+#include "log.h"
 
 
 SDL_Texture* load_texture(const char* path)
@@ -109,6 +110,8 @@ int init_window(config* cfg)
         send_message_error(SDL_GetError());
         return -1;
     }
+	
+	send_message_log("Initialization window");
 	return 0;
 }
 
@@ -117,5 +120,6 @@ void close_window()
     SDL_Window* window = get_window(NULL);
     SDL_DestroyWindow(window);
     SDL_Quit();
+	send_message_log("Close window");
 }
 

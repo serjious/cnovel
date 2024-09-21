@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 set(PROJECT_NAME cnovel)
 project(${PROJECT_NAME} LANGUAGES C)
+message("Using ${CMAKE_C_COMPILER_ID} compiler")
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+message(${CMAKE_SOURCE_DIR})
 set(CMAKE_C_STANDARD 90) 
 set(CMAKE_C_STANDARD_REQUIRED OFF)
 
@@ -38,6 +41,8 @@ set(HEADERS 	include/config.h
 )
 
 add_executable(cnovel ${SOURCES} ${HEADERS})
+
+
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE )	
 endif(MSVC)
