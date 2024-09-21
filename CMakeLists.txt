@@ -7,9 +7,6 @@ set(CMAKE_C_STANDARD_REQUIRED OFF)
 
 include_directories(include)
 
-set(CMAKE_C_FLAGS_DEBUG_INIT "-Wall -ansi -pedantic -g")
-set(CMAKE_C_FLAGS_RELEASE_INIT  "-Wall -ansi -pedantic")
-
 set(SOURCES 	src/main.c
 		src/config.c
 		src/error.c
@@ -41,15 +38,20 @@ set(HEADERS 	include/config.h
 )
 
 add_executable(cnovel ${SOURCES} ${HEADERS})
+if(MSVC)
+	target_compile_options(${PROJECT_NAME} PRIVATE )	
+endif(MSVC)
 
-if(WIN32)
-	target_link_libraries(${PROJECT_NAME} mingw32 SDL2main
-							 SDL2 SDL2_mixer SDL2_image)
-endif(WIN32)
+if(MINGW)
+	target_link_libraries(${PROJECT_NAME} mingw32)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic)
+endif(MINGW)
+
 
 if(UNIX)
-	target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_mixer
-											 SDL2_image)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic)
 endif(UNIX)
 
+
+target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_mixer SDL2_image)
 

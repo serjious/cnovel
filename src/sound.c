@@ -7,6 +7,7 @@
 #include "strutils.h"
 #include "def.h"
 #include "save.h"
+#include "log.h"
 
 
 typedef enum m_audio_channel{
@@ -15,6 +16,7 @@ typedef enum m_audio_channel{
 	cn_channel_voice
 } cn_audio_channel;
 
+
 enum {
 	chunk_size = 2048,
 	audio_name_str_size = 128,
@@ -22,15 +24,18 @@ enum {
     /*variable size is not may be different*/
 };
 
+
 typedef enum m_load_type {
     cn_music,
     cn_chunk
 } load_type;
 /*maybe mv save.h*/
+
 typedef struct m_audio_info {
 	cn_type_data_save type;	
 	int len;
 } cn_audio_info;
+
 
 typedef struct m_audio {
 	char name[audio_name_str_size];
@@ -45,10 +50,12 @@ typedef struct m_audio {
     Mix_Chunk* chunk;
 } cn_audio;
 
+
 typedef struct m_node {
     cn_audio* audio;
     struct m_node* next;
 } node;
+
 
 static node* first_elem(node* new_first, variable_control boolean)
 {
@@ -60,6 +67,7 @@ static node* first_elem(node* new_first, variable_control boolean)
     }
     return first;
 }
+
 
 static void set_first(node* new_first)
 {
@@ -114,6 +122,7 @@ static void delete_audio(node** first)
     free(*first);
     *first = NULL;
 }
+
 static int len_audio(node *first)
 {
 	node* tmp = first;
@@ -139,8 +148,6 @@ static cn_audio* search_audio(node* first, const char* name)
     return NULL;
 }
 
-
-
 int init_audio(config* cfg)
 {
 	int init;
@@ -164,6 +171,7 @@ int init_audio(config* cfg)
 	}
 
 	set_volume(cfg);
+	send_message_log("Initiatization audio subsystem");
 	return 0;
 }
 
@@ -184,6 +192,7 @@ void set_volume(config* cfg)
 	place_in_range(&effect_volume, percent_min, percent_max, 1, 128);
 	Mix_Volume(cn_channel_effect, effect_volume);
 }
+
 /* bug we can load a several audio with the same name */
 /*return 0?*/
 static int load_audio(const char* name, const char* path, 
@@ -195,14 +204,19 @@ static int load_audio(const char* name, const char* path,
     set_first(first);
     return 0;
 }
+
 int load_music(const char* name, const char* path)
 {
+	char log_message[log_str_size];
+	
     return load_audio(name, path, cn_music, cn_channel_music);
 }
+
 int load_voice(const char* name, const char* path)
 {
     return load_audio(name, path, cn_chunk, cn_channel_voice);
 }
+
 int load_effect(const char* name, const char* path)
 {
     return load_audio(name, path, cn_chunk, cn_channel_effect);
@@ -211,9 +225,13 @@ int load_effect(const char* name, const char* path)
 int play_music(const char* name)
 {
     int st;
-    node* first = get_first();
+    node* first;
+	char log_message[log_str_size];
+
+	first = get_first();
     cn_audio* audio = search_audio(first, name);
 	audio->channel = cn_channel_music;
+
 	if(!audio || !audio->music) {
         fatal_error(cn_ok);
         send_message_error("No music whis this name found");
@@ -226,15 +244,22 @@ int play_music(const char* name)
         return -1;
     }
     audio->is_playing = cn_true;
+
+	sprintf(log_message, "Play music %s", name);
+	send_message_log(log_message);
     return 0;
 }
 
 int play_voice(const char* name)
 {
     int st;
-    node* first = get_first();
+    node* first;
+	char log_message[log_str_size];
+
+	first = get_first();
     cn_audio* audio = search_audio(first, name);
 	audio->channel = cn_channel_voice;
+
 	if(!audio || !audio->chunk) {
         fatal_error(cn_ok);
         send_message_error("No voice whis this name found");
@@ -247,15 +272,22 @@ int play_voice(const char* name)
         return -1;
     }
     audio->is_playing = cn_true;
+
+	sprintf(log_message, "Play voice %s", name);
+	send_message_log(log_message);
     return 0;
 }
 
 int play_effect(const char* name, playback_options opt)
 {
     int st;
-    node* first = get_first();
+    node* first;
+	char log_message[log_str_size];
+
+	first = get_first();
     cn_audio* audio = search_audio(first, name);
 	audio->channel = cn_channel_effect;
+
     if(!audio || !audio->chunk) {
         fatal_error(cn_ok);
         send_message_error("No effect whis this name found");
@@ -267,6 +299,10 @@ int play_effect(const char* name, playback_options opt)
         send_message_error(Mix_GetError());
         return -1;
     }
+	audio->is_playing = cn_true;
+
+	sprintf(log_message, "Play effect %s", name);
+	send_message_log(log_message);
     return 0;
 }
 
@@ -281,6 +317,7 @@ int halt_music()
     }
     return 0;
 }
+
 int halt_voice()
 {
     int st;
@@ -292,6 +329,7 @@ int halt_voice()
     }
     return 0;
 }
+
 int halt_effect()
 {
     int st;
@@ -304,15 +342,16 @@ int halt_effect()
     return 0;
 }
 
-
 void pause_music()
 {
 	Mix_PauseMusic();
 }
+
 void pause_voice()
 {
     Mix_Pause(cn_channel_voice);
 }
+
 void pause_effect()
 {
     Mix_Pause(cn_channel_effect);
@@ -322,10 +361,12 @@ void resume_music()
 {
 	Mix_ResumeMusic();
 }
+
 void resume_voice()
 {
     Mix_Resume(cn_channel_voice);
 }
+
 void resume_effect()
 {
     Mix_Resume(cn_channel_effect);
@@ -351,12 +392,14 @@ int save_audio_to_file(FILE* fd)
 	}
 	return 0;
 }
+
 int load_audio_from_file(FILE* fd)
 {
 	node* first;
 	cn_audio_info info;
 	int i;
 	
+	first = get_first();	
 	halt_music();
 	halt_voice();
 	halt_effect();	
@@ -397,7 +440,9 @@ int load_audio_from_file(FILE* fd)
 
 void close_audio()
 {
-	node* first = get_first();
+	node* first;
+
+	first = get_first();
 
     halt_music();
     halt_voice();
@@ -408,5 +453,6 @@ void close_audio()
 
     Mix_CloseAudio();
     Mix_Quit();
+	send_message_log("Close audio subsystem");	
 }
 
