@@ -31,8 +31,10 @@ typedef enum m_load_type {
 } load_type;
 /*maybe mv save.h*/
 
+
+/*is title, not info*/
 typedef struct m_audio_info {
-	cn_type_data_save type;	
+	cn_type_data_save type;
 	int len;
 } cn_audio_info;
 
@@ -40,12 +42,12 @@ typedef struct m_audio_info {
 typedef struct m_audio {
 	char name[audio_name_str_size];
 	char path[path_str_size];
-	
+
 	load_type type;
 	cn_audio_channel channel;
 
 	cn_bool is_playing;
-	
+
     Mix_Music* music;
     Mix_Chunk* chunk;
 } cn_audio;
@@ -94,7 +96,7 @@ static void push_audio(node **first, const char* name,
 			tmp->audio->music = Mix_LoadMUS(path);
 			tmp->audio->chunk = NULL;
 		} else {
-			tmp->audio->chunk = Mix_LoadWAV(path);
+            tmp->audio->chunk = Mix_LoadWAV(path);
 			tmp->audio->music = NULL;
 		}
 		cn_strncpy(tmp->audio->name, name, audio_name_str_size);
@@ -111,11 +113,11 @@ static void push_audio(node **first, const char* name,
 
 static void delete_audio(node** first)
 {
-    if(!*first) {
+    if(!*first)
         return;
-    } else {
+    else
         delete_audio(&(*first)->next);
-    }
+
     Mix_FreeChunk((*first)->audio->chunk);
     Mix_FreeMusic((*first)->audio->music);
     free((*first)->audio);
@@ -127,10 +129,9 @@ static int len_audio(node *first)
 {
 	node* tmp = first;
 	int count = 0;
-	while(tmp)
-	{
+	while(tmp) {
 		count++;
-		tmp = tmp->next;	
+		tmp = tmp->next;
 	}
 	return count;
 }
@@ -139,9 +140,8 @@ static cn_audio* search_audio(node* first, const char* name)
 {
     node* tmp = first;
 
-    while(tmp)
-    {
-        if(0 == cn_strcmp(tmp->audio->name, name)) 
+    while(tmp) {
+        if(0 == cn_strcmp(tmp->audio->name, name))
            return tmp->audio;
         tmp = tmp->next;
     }
@@ -163,7 +163,8 @@ int init_audio(config* cfg)
 
 	init = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
                          MIX_DEFAULT_FORMAT,
-                         MIX_DEFAULT_CHANNELS, chunk_size);
+                         MIX_DEFAULT_CHANNELS,
+                         chunk_size);
 	if(-1 == init) {
         fatal_error(cn_ok);
         send_message_error(Mix_GetError());
@@ -171,7 +172,7 @@ int init_audio(config* cfg)
 	}
 
 	set_volume(cfg);
-	send_message_log("Initiatization audio subsystem");
+	printf_log("Initiatization audio subsystem");
 	return 0;
 }
 
@@ -195,7 +196,7 @@ void set_volume(config* cfg)
 
 /* bug we can load a several audio with the same name */
 /*return 0?*/
-static int load_audio(const char* name, const char* path, 
+static int load_audio(const char* name, const char* path,
 					  load_type type, cn_audio_channel channel)
 {
     node* first;
@@ -204,11 +205,8 @@ static int load_audio(const char* name, const char* path,
     set_first(first);
     return 0;
 }
-
 int load_music(const char* name, const char* path)
 {
-	char log_message[log_str_size];
-	
     return load_audio(name, path, cn_music, cn_channel_music);
 }
 
@@ -226,10 +224,10 @@ int play_music(const char* name)
 {
     int st;
     node* first;
-	char log_message[log_str_size];
+    cn_audio* audio;
 
 	first = get_first();
-    cn_audio* audio = search_audio(first, name);
+    audio = search_audio(first, name);
 	audio->channel = cn_channel_music;
 
 	if(!audio || !audio->music) {
@@ -245,8 +243,7 @@ int play_music(const char* name)
     }
     audio->is_playing = cn_true;
 
-	sprintf(log_message, "Play music %s", name);
-	send_message_log(log_message);
+	printf_log("Play music %s", name);
     return 0;
 }
 
@@ -254,10 +251,10 @@ int play_voice(const char* name)
 {
     int st;
     node* first;
-	char log_message[log_str_size];
+    cn_audio* audio;
 
 	first = get_first();
-    cn_audio* audio = search_audio(first, name);
+    audio = search_audio(first, name);
 	audio->channel = cn_channel_voice;
 
 	if(!audio || !audio->chunk) {
@@ -273,8 +270,7 @@ int play_voice(const char* name)
     }
     audio->is_playing = cn_true;
 
-	sprintf(log_message, "Play voice %s", name);
-	send_message_log(log_message);
+	printf_log("Play voice %s", name);
     return 0;
 }
 
@@ -282,10 +278,10 @@ int play_effect(const char* name, playback_options opt)
 {
     int st;
     node* first;
-	char log_message[log_str_size];
+    cn_audio* audio;
 
 	first = get_first();
-    cn_audio* audio = search_audio(first, name);
+    audio = search_audio(first, name);
 	audio->channel = cn_channel_effect;
 
     if(!audio || !audio->chunk) {
@@ -301,8 +297,7 @@ int play_effect(const char* name, playback_options opt)
     }
 	audio->is_playing = cn_true;
 
-	sprintf(log_message, "Play effect %s", name);
-	send_message_log(log_message);
+	printf_log("Play effect %s", name);
     return 0;
 }
 
@@ -377,7 +372,7 @@ int save_audio_to_file(FILE* fd)
 	cn_audio_info info;
 	node* first;
 	int len;
-	
+
 	first = get_first();
 	len = len_audio(first);
 
@@ -385,26 +380,25 @@ int save_audio_to_file(FILE* fd)
 	info.len = len;
 
 	fwrite(&info, 1, sizeof(info), fd);
-	while(first)
-	{	
+	while(first) {
 		fwrite(first->audio, 1, sizeof(cn_audio), fd);
 		first = first->next;
 	}
 	return 0;
 }
-
+/*make refactoring*/
 int load_audio_from_file(FILE* fd)
 {
 	node* first;
 	cn_audio_info info;
 	int i;
-	
-	first = get_first();	
+
+	first = get_first();
 	halt_music();
 	halt_voice();
-	halt_effect();	
+	halt_effect();
 	delete_audio(&first);
-	
+
 	fread(&info, 1, sizeof(info), fd);
 	if(info.type != cn_type_data_audio)
 		return -1;
@@ -418,7 +412,6 @@ int load_audio_from_file(FILE* fd)
 			if(tmp.is_playing)
 				play_music(tmp.name);
 			break;
-	
 		case cn_chunk:
 			switch (tmp.channel) {
 			case cn_channel_voice:
@@ -426,16 +419,15 @@ int load_audio_from_file(FILE* fd)
 				if(tmp.is_playing)
 					play_voice(tmp.name);
 				break;
-	
 			case cn_channel_effect:
 				load_effect(tmp.name, tmp.path);
 				if(tmp.is_playing)
 					play_effect(tmp.name, cn_loop);
 				break;
-			}		
+			}
 			break;
 		}
-	}	
+	}
 }
 
 void close_audio()
@@ -453,6 +445,6 @@ void close_audio()
 
     Mix_CloseAudio();
     Mix_Quit();
-	send_message_log("Close audio subsystem");	
+	printf_log("Close audio subsystem");
 }
 

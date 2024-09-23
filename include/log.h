@@ -6,7 +6,8 @@ enum {
 };
 
 void enable_log();
+void disable_log();
 
-void send_message_log(const char* message);
+int printf_log(const char* format, ...);
 
 #endif

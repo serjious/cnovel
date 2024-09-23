@@ -9,7 +9,6 @@
 int save(const char* path)
 {
 	FILE* fd;
-	char log_message[log_str_size];
 	fd = fopen(path, "wb");
 	if(!fd) {
 		char error_message[error_str_size];
@@ -18,19 +17,17 @@ int save(const char* path)
 		send_message_error(error_message);
 		return -1;
 	}
-	
-	save_audio_to_file(fd);	
-	sprintf(log_message, "Saved %s", path);
-	send_message_log(log_message);	
+
+	save_audio_to_file(fd);
+	printf_log("Saved %s", path);
 
 	fclose(fd);
-	return 0; 
+	return 0;
 }
 
 int load(const char* path)
 {
 	FILE* fd;
-	char log_message[log_str_size];
 	fd = fopen(path, "rb");
 	if(!fd) {
 		char error_message[error_str_size];
@@ -39,13 +36,10 @@ int load(const char* path)
 		send_message_error(error_message);
 		return -1;
 	}
-	
+
 	load_audio_from_file(fd);
-	
-	sprintf(log_message, "Load %s", path);
-	send_message_log(log_message);
+	printf_log("Load %s", path);
 
 	fclose(fd);
-
 	return 0;
 }

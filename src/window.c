@@ -111,7 +111,7 @@ int init_window(config* cfg)
         return -1;
     }
 	
-	send_message_log("Initialization window");
+	printf_log("Initialization window");
 	return 0;
 }
 
@@ -120,6 +120,6 @@ void close_window()
     SDL_Window* window = get_window(NULL);
     SDL_DestroyWindow(window);
     SDL_Quit();
-	send_message_log("Close window");
+	printf_log("Close window");
 }
 
