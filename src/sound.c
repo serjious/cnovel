@@ -156,7 +156,6 @@ int init_audio(config* cfg)
 	init = SDL_Init(SDL_INIT_AUDIO);
 
 	if(-1 == init) {
-		fatal_error(cn_ok);
 		send_message_error(Mix_GetError());
 		return -1;
 	}
@@ -166,7 +165,6 @@ int init_audio(config* cfg)
                          MIX_DEFAULT_CHANNELS,
                          chunk_size);
 	if(-1 == init) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
 		return -1;
 	}
@@ -231,13 +229,11 @@ int play_music(const char* name)
 	audio->channel = cn_channel_music;
 
 	if(!audio || !audio->music) {
-        fatal_error(cn_ok);
         send_message_error("No music whis this name found");
         return -1;
     }
     st = Mix_PlayMusic(audio->music, cn_loop);
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }
@@ -258,13 +254,11 @@ int play_voice(const char* name)
 	audio->channel = cn_channel_voice;
 
 	if(!audio || !audio->chunk) {
-        fatal_error(cn_ok);
         send_message_error("No voice whis this name found");
         return -1;
     }
     st = Mix_PlayChannel(audio->channel, audio->chunk, cn_unloop);
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }
@@ -285,13 +279,11 @@ int play_effect(const char* name, playback_options opt)
 	audio->channel = cn_channel_effect;
 
     if(!audio || !audio->chunk) {
-        fatal_error(cn_ok);
         send_message_error("No effect whis this name found");
         return -1;
     }
     st = Mix_PlayChannel(audio->channel, audio->chunk, opt);
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }
@@ -306,7 +298,6 @@ int halt_music()
     int st;
     st = Mix_HaltMusic();
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }
@@ -318,7 +309,6 @@ int halt_voice()
     int st;
     st = Mix_HaltChannel(cn_channel_voice);
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }
@@ -330,7 +320,6 @@ int halt_effect()
     int st;
     st = Mix_HaltChannel(cn_channel_effect);
     if(-1 == st) {
-        fatal_error(cn_ok);
         send_message_error(Mix_GetError());
         return -1;
     }

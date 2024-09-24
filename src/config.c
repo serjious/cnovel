@@ -159,8 +159,9 @@ int read_from_config(const char* path, config* cfg)
 	/*print strerror(error)*/
 	if(!fd) {
 		set_as_default(cfg);
-		sprintf(error_message, "%s: %s", path, "Can't open file for read, will be used standard settigs");
-		fatal_error(cn_ok);
+		sprintf(error_message, "%s: %s", path,
+		"Can't open file for read, will be used standard settigs");
+	
 		send_message_error(error_message);
 		return -1;
 	}
@@ -177,8 +178,8 @@ int read_from_config(const char* path, config* cfg)
 	fclose(fd);
 	if(0 != check_valid_values(cfg)) {
 		set_as_default(cfg);
-		sprintf(error_message, "%s: %s", path, "Incorrect settings, will be used standard settings");
-		fatal_error(cn_ok);
+		sprintf(error_message, "%s: %s", path, 
+		"Incorrect settings, will be used standard settings");
 		send_message_error(error_message);
 		return -1;
 	}
@@ -197,7 +198,7 @@ int write_to_config(const char* path, config* cfg)
 	fd = fopen(path, "w");
 	if(!fd) {
 		sprintf(error_message, "%s: %s", path, "Can't open file for write");
-		fatal_error(cn_fatal);
+		fatal_error();
 		send_message_error(error_message);
 		return -1;
 	}

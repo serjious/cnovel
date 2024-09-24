@@ -92,21 +92,21 @@ int init_window(config* cfg)
 
 	init = SDL_Init(SDL_INIT_VIDEO);
     if(-1 == init) {
-        fatal_error(cn_fatal);
+        fatal_error();
         send_message_error(SDL_GetError());
         return -1;
     }
 
     init = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     if(-1 == init) {
-        fatal_error(cn_fatal);
+        fatal_error();
         send_message_error(SDL_GetError());
         return -1;
     }
 
     init = create_window(cfg);
     if(-1 == init) {
-        fatal_error(cn_fatal);
+        fatal_error();
         send_message_error(SDL_GetError());
         return -1;
     }

@@ -13,7 +13,6 @@ int save(const char* path)
 	if(!fd) {
 		char error_message[error_str_size];
 		sprintf(error_message, "%s: %s", path, strerror(errno));
-		fatal_error(cn_ok);
 		send_message_error(error_message);
 		return -1;
 	}
@@ -32,7 +31,6 @@ int load(const char* path)
 	if(!fd) {
 		char error_message[error_str_size];
 		sprintf(error_message, "%s: %s", path, strerror(errno));
-		fatal_error(cn_ok);
 		send_message_error(error_message);
 		return -1;
 	}

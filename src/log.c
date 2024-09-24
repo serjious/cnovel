@@ -28,10 +28,10 @@ int printf_log(const char* format, ...)
 	if(cn_auto_output) {
 		time(&m_time);
 		cur_t = localtime(&m_time);
+		printf("[%02d:%02d:%02d][LOG]: ",	cur_t->tm_hour,
+											cur_t->tm_min,
+											cur_t->tm_sec);
         va_start(vl, format);
-		printf("[%d:%d:%d][LOG]: ", cur_t->tm_hour,
-									cur_t->tm_min,
-									cur_t->tm_sec);
 		result = vprintf(format, vl);
 		printf("\n");
         va_end(vl);
