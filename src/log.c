@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 #include "log.h"
 #include "def.h"
 
 static cn_bool cn_auto_output = cn_false;
-static char log_message[log_str_size];
 
 void enable_log()
 {
@@ -15,17 +15,23 @@ void disable_log()
 {
 	cn_auto_output = cn_false;
 }
-
+/*print time*/
 int printf_log(const char* format, ...)
 {
     int result;
 	va_list vl;
+	time_t m_time;
+	struct tm* cur_t; 
 
 	result = -1;
 
 	if(cn_auto_output) {
+		time(&m_time);
+		cur_t = localtime(&m_time);
         va_start(vl, format);
-		printf("[LOG]: ");
+		printf("[%d:%d:%d][LOG]: ", cur_t->tm_hour,
+									cur_t->tm_min,
+									cur_t->tm_sec);
 		result = vprintf(format, vl);
 		printf("\n");
         va_end(vl);
@@ -33,4 +39,3 @@ int printf_log(const char* format, ...)
 
 	return result;
 }
-

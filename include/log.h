@@ -1,6 +1,6 @@
 #ifndef LOG_H_SENTRY
 #define LOG_H_SENTRY
-
+/*delete*/
 enum {
 	log_str_size = 128
 };
