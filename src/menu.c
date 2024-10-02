@@ -28,6 +28,7 @@ void presentScene()
 void blit()
 {
     static int is_load = 0;
+    SDL_Rect dest;
     SDL_Renderer* renderer = get_renderer();
     SDL_Texture* texture;
     if(!is_load) {
@@ -36,7 +37,6 @@ void blit()
     }
 
     texture = menu_texture(NULL);
-    SDL_Rect dest;
     dest.x = 100;
     dest.y = 100;
 

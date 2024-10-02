@@ -24,33 +24,23 @@ SDL_Texture* load_texture(const char* path)
 
 
 /*fix lenght*/
-static cn_app main_window(SDL_Window* new_window, SDL_Renderer* new_renderer, variable_control st)
-{
-    static cn_app app = {NULL, NULL};
-    if(st == cn_set) {
-        app.window = new_window;
-        app.renderer = new_renderer;
-    }
-    return app;
-}
+static cn_app app = {NULL, NULL};
 
 void set_window(SDL_Window* new_window)
 {
-    main_window(new_window, NULL, cn_set);
+	app.window = new_window; 
 }
 void set_renderer(SDL_Renderer* new_renderer)
 {
-    main_window(NULL, new_renderer, cn_set);
+	app.renderer = new_renderer;  
 }
 
 SDL_Window* get_window()
 {
-    cn_app app = main_window(NULL, NULL, cn_get);
     return app.window;
 }
 SDL_Renderer* get_renderer()
 {
-    cn_app app = main_window(NULL, NULL, cn_get);
     return app.renderer;
 }
 
@@ -93,24 +83,21 @@ int init_window(config* cfg)
 	init = SDL_Init(SDL_INIT_VIDEO);
     if(-1 == init) {
         fatal_error();
-        send_message_error(SDL_GetError());
+        printf_error(SDL_GetError());
         return -1;
     }
-
     init = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     if(-1 == init) {
         fatal_error();
-        send_message_error(SDL_GetError());
+        printf_error(SDL_GetError());
         return -1;
     }
-
     init = create_window(cfg);
     if(-1 == init) {
         fatal_error();
-        send_message_error(SDL_GetError());
+        printf_error(SDL_GetError());
         return -1;
     }
-	
 	printf_log("Initialization window");
 	return 0;
 }

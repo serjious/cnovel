@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
+#include "engine.h"
 #include "config.h"
 #include "window.h"
 #include "sound.h"
@@ -9,58 +10,11 @@
 #include "save.h"
 #include "log.h"
 
-
 int main(int argc, char* argv[])
 {
-	int st;
-	config* cfg;
-	
-	if(argc < 4) {
-        fprintf(stderr, "argv err\n");
-        return 1;
-    }
-
-	enable_log();
-
-    cfg = calloc(sizeof(config), 1);
-
-    st = read_from_config(argv[1], cfg);
-    ERROR_HANDLING(st);
-
-    st = init_audio(cfg);
-    ERROR_HANDLING(st);
-	
-/*
-	st = load("saveall.bin");	
-	ERROR_HANDLING(st);
-
-	while(1)
-	{
-		int c = getchar();
-		if(c == EOF || c == 'q')
-			break;
-	}
-	
-	
-*/
-	load_music(argv[2], argv[2]);	
-	load_effect(argv[3], argv[3]);	
-	load_voice(argv[4], argv[4]);	
-	
-	play_voice(argv[4]);
-	st = save("game/saves/save1.bin");
-	ERROR_HANDLING(st);
-	while(1)
-	{
-		int c = getchar();
-		if(c == EOF || c == 'q')
-			break;
-	}
-		
-    close_audio();
-    free(cfg);
+	init_cnovel(argc, argv);
+	example_save(argc, argv);	
 	return 0;
-	
 }
 /*
 int main(int argc, char* argv[])

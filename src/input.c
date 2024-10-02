@@ -42,4 +42,5 @@ int key_handler()
         else if(event.type == SDL_QUIT)
             return 1;
     }
+	return 0;
 }

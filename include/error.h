@@ -8,12 +8,11 @@
 	while(0)
 
 enum {
-	error_str_size = 128
-	/*change*/
+	error_str_size = 512 
 };
 
 void fatal_error();
-char* send_message_error(const char* message);
+void printf_error(const char* format, ...);
 void print_error();
 
 #endif

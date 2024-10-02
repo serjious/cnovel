@@ -152,17 +152,14 @@ static void init_config(const char* key, const char* value, config* cfg)
 int read_from_config(const char* path, config* cfg)
 {
 	char buf[cfg_str_size];
-	char error_message[error_str_size];
 	FILE* fd;
 
 	fd = fopen(path, "r");
 	/*print strerror(error)*/
 	if(!fd) {
 		set_as_default(cfg);
-		sprintf(error_message, "%s: %s", path,
+		printf_error("%s: %s", path,
 		"Can't open file for read, will be used standard settigs");
-	
-		send_message_error(error_message);
 		return -1;
 	}
 
@@ -178,9 +175,8 @@ int read_from_config(const char* path, config* cfg)
 	fclose(fd);
 	if(0 != check_valid_values(cfg)) {
 		set_as_default(cfg);
-		sprintf(error_message, "%s: %s", path, 
+		printf_error("%s: %s", path, 
 		"Incorrect settings, will be used standard settings");
-		send_message_error(error_message);
 		return -1;
 	}
 	return 0;
@@ -188,7 +184,6 @@ int read_from_config(const char* path, config* cfg)
 
 int write_to_config(const char* path, config* cfg)
 {
-	char error_message[error_str_size];
 	FILE* fd;
 	int i;
 	/*
@@ -197,9 +192,8 @@ int write_to_config(const char* path, config* cfg)
 	*/
 	fd = fopen(path, "w");
 	if(!fd) {
-		sprintf(error_message, "%s: %s", path, "Can't open file for write");
+		printf_error("%s: %s", path, "Can't open file for write");
 		fatal_error();
-		send_message_error(error_message);
 		return -1;
 	}
 

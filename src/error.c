@@ -1,5 +1,5 @@
-#include <error.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 #include "def.h"
@@ -7,18 +7,23 @@
 #include "strutils.h"
 
 static cn_bool is_fatal_error = cn_false;
+static char error_message[error_str_size] = "No error :)";
 
 void fatal_error()
 {
 	is_fatal_error = cn_true;	
 }
 
-char* send_message_error(const char* message)
+void printf_error(const char* format, ...)
 {
-	static char error_message[error_str_size];
-	if(message)
-		cn_strncpy(error_message, message, error_str_size - 1);
-	return error_message;
+	va_list vl;
+
+	va_start(vl, format);
+	vsprintf(error_message, format, vl);
+	/*vsnprintf in c99 :((*/
+	va_end(vl);
+	/*auto print error*/
+	print_error();
 }
 
 void print_error()
@@ -33,11 +38,10 @@ void print_error()
 										cur_t->tm_sec);
     if(is_fatal_error)
 	{
-        fprintf(stderr, "[FATAL ERROR]: %s\n", send_message_error(NULL));
+        fprintf(stderr, "[FATAL ERROR]: %s\n", error_message);
 		exit(1);
     } else {
-        fprintf(stderr, "[ERROR]: %s\n", send_message_error(NULL));
+        fprintf(stderr, "[ERROR]: %s\n", error_message);
 	}
 }
-/*if input value is cn_invariable, we don't change static int variable*/
 

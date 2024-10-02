@@ -6,24 +6,32 @@
 
 static cn_bool cn_auto_output = cn_false;
 
+
+static void print_info()
+{
+	int i;
+	printf("CNOVEL - visual novel engine\n");
+	for(i = 0; i < 80; i++)
+		putchar('-');
+	putchar('\n');
+}
+
 void enable_log()
 {
 	cn_auto_output = cn_true;
+	print_info();	
 }
 
 void disable_log()
 {
 	cn_auto_output = cn_false;
 }
-/*print time*/
-int printf_log(const char* format, ...)
+
+void printf_log(const char* format, ...)
 {
-    int result;
 	va_list vl;
 	time_t m_time;
 	struct tm* cur_t; 
-
-	result = -1;
 
 	if(cn_auto_output) {
 		time(&m_time);
@@ -32,10 +40,8 @@ int printf_log(const char* format, ...)
 											cur_t->tm_min,
 											cur_t->tm_sec);
         va_start(vl, format);
-		result = vprintf(format, vl);
-		printf("\n");
+		vprintf(format, vl);
         va_end(vl);
+		putchar('\n');
 	}
-
-	return result;
 }
