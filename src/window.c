@@ -1,112 +1,84 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_video.h>
-#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_image.h>
 #include <stdint.h>
+#include "config.h"
 #include "error.h"
-#include "window.h"
-#include "def.h"
-#include "sound.h"
+#include "def.h" 
 #include "log.h"
 
+cn_bool glb_running = cn_false;
+SDL_Window* glb_window = NULL;
+SDL_Renderer* glb_renderer = NULL;
 
-SDL_Texture* load_texture(const char* path)
+static cn_bool is_init = cn_false;
+
+static int create_window()
 {
-    SDL_Texture* texture;
-    SDL_Renderer* renderer;
+	uint32_t win_flags, render_flags;
+	
+	win_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+	render_flags = SDL_RENDERER_ACCELERATED;
+	
+	glb_window = SDL_CreateWindow("Cnovel", SDL_WINDOWPOS_CENTERED,
+								  SDL_WINDOWPOS_CENTERED, 1024,
+								  792, win_flags);
+	if(!glb_window)
+		return -1;
+	glb_renderer = SDL_CreateRenderer(glb_window, -1, render_flags);
+	if(!glb_renderer)
+		return -1;
+	SDL_SetRenderDrawColor(glb_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(glb_renderer);
+	SDL_RenderPresent(glb_renderer);
+	return 0;
 
-    renderer = get_renderer();
-    texture = IMG_LoadTexture(renderer, path);
-    return texture;
 }
-
-
-/*fix lenght*/
-static cn_app app = {NULL, NULL};
-
-void set_window(SDL_Window* new_window)
+int load_texture(const char* path, SDL_Texture* texture)
 {
-	app.window = new_window; 
+	SDL_Surface* loaded_surface;
+	loaded_surface = IMG_Load(path);
+	if(!loaded_surface) {
+		printf_error(SDL_GetError());
+		return -1;
+	}
+	texture = SDL_CreateTextureFromSurface(glb_renderer, loaded_surface);
+	if(!texture) {
+		printf_error(SDL_GetError());
+		return -1;
+	}
+	printf_log("Load texture: %s", path);
+	return 0;
 }
-void set_renderer(SDL_Renderer* new_renderer)
+int init_window()
 {
-	app.renderer = new_renderer;  
-}
-
-SDL_Window* get_window()
-{
-    return app.window;
-}
-SDL_Renderer* get_renderer()
-{
-    return app.renderer;
-}
-
-static int create_window(config* cfg)
-{
-    uint32_t window_flags, renderer_flags;
-    SDL_Window* window = get_window();
-    SDL_Renderer* renderer = get_renderer();
-
-    window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-    if(cfg->fullscreen)
-        window_flags |= SDL_WINDOW_FULLSCREEN;
-
-    window = SDL_CreateWindow("Cnovel", SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED, cfg->width,
-                              cfg->height, window_flags);
-    if(!window)
-        return -1;
-
-
-    renderer_flags = SDL_RENDERER_ACCELERATED;
-    renderer = SDL_CreateRenderer(window, -1, renderer_flags);
-    if(!renderer)
-        return -1;
-
-    set_window(window);
-    set_renderer(renderer);
-    return 0;
-}
-
-int run_window()
-{
-    return 1;
-}
-
-int init_window(config* cfg)
-{
-	int init;
-
-	init = SDL_Init(SDL_INIT_VIDEO);
-    if(-1 == init) {
-        fatal_error();
-        printf_error(SDL_GetError());
-        return -1;
-    }
-    init = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-    if(-1 == init) {
-        fatal_error();
-        printf_error(SDL_GetError());
-        return -1;
-    }
-    init = create_window(cfg);
-    if(-1 == init) {
-        fatal_error();
-        printf_error(SDL_GetError());
-        return -1;
-    }
-	printf_log("Initialization window");
+	int st;
+	if(is_init) {
+		printf_error("Window subsystem has already been initialized");
+		return -1;
+	}
+	st = SDL_Init(SDL_INIT_VIDEO /* | SDL_INIT_IMAGE */);
+	if(st == -1) {
+		fatal_error();
+		printf_error(SDL_GetError());
+		return -1;
+	}
+	st = create_window();
+	if(st == -1) {
+		fatal_error();
+		printf_error(SDL_GetError());
+		return -1;
+	}
+	glb_running = cn_true;
+	is_init = cn_true;
+	printf_log("Init window");
 	return 0;
 }
 
 void close_window()
 {
-    SDL_Window* window = get_window(NULL);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
 	printf_log("Close window");
+	SDL_DestroyWindow(glb_window);
+	SDL_DestroyRenderer(glb_renderer);
+	SDL_Quit();	
 }
-

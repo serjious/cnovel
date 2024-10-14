@@ -10,10 +10,11 @@
 #include "save.h"
 #include "log.h"
 
+
 int main(int argc, char* argv[])
 {
 	init_cnovel(argc, argv);
-	example_save(argc, argv);	
+	example_window();	
 	return 0;
 }
 /*

@@ -45,6 +45,7 @@ typedef struct m_audio {
 	cn_audio_channel channel;
 
 	cn_bool is_playing;
+	cn_bool is_pause;
 	
 	void* ptr_music;
 } cn_audio;
@@ -54,8 +55,14 @@ typedef struct m_node {
     struct m_node* next;
 } node;
 
+static cn_audio* playable_channels[3] = {
+	NULL,
+	NULL,
+	NULL
+};
 
 static node* glb_first_node = NULL;
+static cn_bool is_init = cn_false;
 
 static void set_first(node* new_first)
 {
@@ -111,7 +118,7 @@ static void delete_audio(node** first)
     *first = NULL;
 }
 
-static int len_audio(node *first)
+static int len_audio(node* first)
 {
 	node* tmp = first;
 	int count = 0;
@@ -137,8 +144,10 @@ static cn_audio* search_audio(node* first, const char* name)
 int init_audio(config* cfg)
 {
 	int init;
-
-
+	if(is_init) {
+		printf_error("Sound subsystem has already been initialized");
+		return -1;
+	}
 	init = SDL_Init(SDL_INIT_AUDIO);
 	if(-1 == init) {
 		fatal_error();
@@ -154,6 +163,7 @@ int init_audio(config* cfg)
 		printf_error(Mix_GetError());
 		return -1;
 	}
+	is_init = cn_true;
 	set_volume(cfg);
 	printf_log("Initiatization audio subsystem");
 	return 0;
@@ -214,10 +224,10 @@ int play_music(const char* name)
     int st;
     node* first;
     cn_audio* audio;
+	cn_audio* prev_audio;
 
 	first = get_first();
     audio = search_audio(first, name);
-
 	if(!audio || !audio->ptr_music || audio->channel != cn_channel_music) {
         printf_error("No music whis this name found");
         return -1;
@@ -229,6 +239,10 @@ int play_music(const char* name)
         return -1;
     }
     audio->is_playing = cn_true;
+	prev_audio = playable_channels[cn_channel_music];
+	if(prev_audio)
+		prev_audio->is_playing = cn_false;
+	playable_channels[cn_channel_music] = audio;	
 	printf_log("Play music: %s", name);
     return 0;
 }
@@ -238,10 +252,10 @@ int play_voice(const char* name)
     int st;
     node* first;
     cn_audio* audio;
+	cn_audio* prev_audio;
 
 	first = get_first();
     audio = search_audio(first, name);
-
 	if(!audio || !audio->ptr_music|| audio->channel != cn_channel_voice) {
         printf_error("No voice whis this name found");
         return -1;
@@ -253,6 +267,10 @@ int play_voice(const char* name)
         return -1;
     }
     audio->is_playing = cn_true;
+	prev_audio = playable_channels[cn_channel_voice];
+	if(prev_audio)
+		prev_audio->is_playing = cn_false;
+	playable_channels[cn_channel_voice] = audio;	
 	printf_log("Play voice: %s", name);
     return 0;
 }
@@ -261,11 +279,11 @@ int play_effect(const char* name)
 {
     int st;
     node* first;
-    cn_audio* audio;
+	cn_audio* audio;
+	cn_audio* prev_audio;
 
 	first = get_first();
     audio = search_audio(first, name);
-
     if(!audio || !audio->ptr_music || audio->channel != cn_channel_effect) {
         printf_error("No effect whis this name found");
         return -1;
@@ -277,6 +295,10 @@ int play_effect(const char* name)
         return -1;
     }
 	audio->is_playing = cn_true;
+	prev_audio = playable_channels[cn_channel_effect];
+	if(prev_audio)
+		prev_audio->is_playing = cn_false;
+	playable_channels[cn_channel_effect] = audio;	
 	printf_log("Play effect: %s", name);
     return 0;
 }
@@ -284,6 +306,10 @@ int play_effect(const char* name)
 int halt_music()
 {
     int st;
+	cn_audio* cur_audio;
+	cur_audio = playable_channels[cn_channel_music];
+	if(cur_audio)
+		cur_audio->is_playing = cn_false;	
     st = Mix_HaltMusic();
     if(-1 == st) {
         printf_error(Mix_GetError());
@@ -295,6 +321,10 @@ int halt_music()
 int halt_voice()
 {
     int st;
+	cn_audio* cur_audio;
+	cur_audio = playable_channels[cn_channel_voice];
+	if(cur_audio)
+		cur_audio->is_playing = cn_false;	
     st = Mix_HaltChannel(cn_channel_voice);
     if(-1 == st) {
         printf_error(Mix_GetError());
@@ -306,6 +336,10 @@ int halt_voice()
 int halt_effect()
 {
     int st;
+	cn_audio* cur_audio;
+	cur_audio = playable_channels[cn_channel_effect];
+	if(cur_audio)
+		cur_audio->is_playing = cn_false;	
     st = Mix_HaltChannel(cn_channel_effect);
     if(-1 == st) {
         printf_error(Mix_GetError());
@@ -362,7 +396,7 @@ void save_audio_to_file(FILE* fd)
 		first = first->next;
 	}	
 }
-/*make refactoring*/
+
 int load_audio_from_file(FILE* fd)
 {
 	int i;
@@ -374,7 +408,7 @@ int load_audio_from_file(FILE* fd)
 	halt_voice();
 	halt_effect();
 	delete_audio(&first);
-
+	set_first(first);
 	fread(&info, 1, sizeof(info), fd);
 	if(info.type != cn_type_data_audio)
 		return -1;

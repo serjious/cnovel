@@ -58,4 +58,5 @@ endif(UNIX)
 
 
 target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_mixer SDL2_image)
+target_compile_options(${PROJECT_NAME} PRIVATE -DBUILD_COUNT=10)
 

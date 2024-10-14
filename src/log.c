@@ -4,6 +4,7 @@
 #include "log.h"
 #include "def.h"
 
+
 static cn_bool cn_auto_output = cn_false;
 
 
@@ -11,6 +12,9 @@ static void print_info()
 {
 	int i;
 	printf("CNOVEL - visual novel engine\n");
+#ifdef BUILD_COUNT
+	printf("Build: %ld\n", BUILD_COUNT);
+#endif
 	for(i = 0; i < 80; i++)
 		putchar('-');
 	putchar('\n');
